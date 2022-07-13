@@ -1,0 +1,67 @@
+.title{
+  color:  #F87474;
+  font-size: 40px;
+  margin-top:2.5%;
+  font-family: "IBM Plex Mono";
+  font-weight:bold;
+
+}
+.logo{
+  width:100%;
+
+
+}
+.project_button{
+    background:#F87474;
+  width:100%;
+  border-radius:40px;
+  animation-name:projectButtonDown;
+  animation-iteration-count: 1;
+  animation-duration: .2s;
+    border-color:#F87474;
+  animation-timing-function: ease-in;
+  color:white;
+  bottom:0px;
+  position:relative;
+}
+
+@keyframes projectButtonDown {
+  from {
+    bottom:10px;
+  }
+  to{
+    bottom:0px;
+  }
+}
+.project_button:hover{
+
+  background:#3AB0FF;
+  border-color:#3AB0FF;
+  bottom:10px;
+  animation-name:projectButtonUp;
+  animation-iteration-count: 1;
+  animation-duration: .2s;
+  color:white;
+  animation-timing-function: ease-in;
+
+}
+
+
+@keyframes projectButtonUp {
+  from {
+    bottom:0px;
+  }
+  to{
+    bottom:10px;
+  }
+}
+
+
+.showcase_img{
+  height:1080px;
+  width:100%;
+  position:absolute;
+  top:0;
+  left:0;
+  z-index:-999;
+}
