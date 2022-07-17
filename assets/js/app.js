@@ -1,79 +1,114 @@
 
-var api_key = "cac5b5f9a86a4977be453f3f2c50d4d6";
-var url = "https://api.giphy.com/v1/gifs/?api_key=cac5b5f9a86a4977be453f3f2c50d4d6";
-var buttons = ["success","warning","danger","info","primary"];
-var randomizer = Math.floor(Math.random()*buttons.length);
-var boot = buttons[randomizer];
-function gifConstruct(items){
-
-  $(".controls").empty();
-$.get({
-url: 'https://api.giphy.com/v1/gifs/search?api_key=cac5b5f9a86a4977be453f3f2c50d4d6&q='+items+'&limit=20&offset=0&rating=PG&lang=en',
-method: "GET"
-}).then(function(response){
-  var randomizer = Math.floor(Math.random()*buttons.length);
-  var boot = buttons[randomizer];
-for (var i=0;i<20;i++){
-
-  var gif = response.data[i].images.fixed_width_still.url;
-  var gifRating = "PG";
-  var container = $("<div>").addClass("col-xs-3 room"+i).appendTo(".controls");
-  var giver = $("<img>").attr("src",gif).addClass("pic gif gif"+i).appendTo(".room"+i);
-  giver.attr("data-still", response.data[i].images.fixed_height_still.url);
-
-giver.attr("data-animate", response.data[i].images.fixed_height.url);
+var searched_terms = [];
 
 
-  giver.attr("data-state", "still");
-
-  var rating=$("<h2>").attr("text-align","center").text("PG").appendTo(".room"+i).addClass("rating");
-
-}
-var topic = $("<button>").addClass("btn top btn-"+boot).appendTo(".topics").text(items).attr("topic",items);
-});
+const GetInputValue = (className)=>{
+  var value = $("."+className).val();
+  return value;
 }
 
-function react () {
+const CreateTab = (search) =>{
 
+  var colorValues = `rgb( ${(Math.random() * 200)},  ${(Math.random() * 200)}, ${(Math.random() * 200)})`;
+  var container = $(".tabs_row");
+  var tab = $("<div>").addClass("col-2 tab").css("border",colorValues+" 2px solid").appendTo(container).attr("value",search);
+  var tab_title = $("<p>").text(search).addClass("tab_text").css("color",colorValues).appendTo(tab);
 
+  tab.on("click",(e)=>{
+    var value = tab.attr("value");
+    GifConstruction(value);
+  });
 
-  var state = $(this).attr("data-state");
+  searched_terms.push(search);
 
+}
 
+const PopulateGifsLoop = (gifs) => {
 
-  if (state === "still") {
+  for(var i = 0; i < gifs.length - 2; i ++){
 
-    $(this).attr("src", $(this).attr("data-animate"));
-
-
-
-    $(this).attr("data-state", "animate");
+    PopulateGifs(gifs[i]);
 
   }
 
+}
 
-  else {
+const PopulateGifs = (gif) => {
 
-    $(this).attr("src", $(this).attr("data-still"));
+  var container = $("<div>").addClass("col-4 gif_container").attr("id",gif.id);
+  var gifImg = $("<img>").addClass("gif_img width-100").attr("src",gif.images.original_still.url).attr("active",0);
 
-    $(this).attr("data-state", "still");
+  gifImg.on("click",(e)=>{
+
+    if($(e.target).attr("active") == 1){
+
+      $(e.target).attr("src",gif.images.original_still.url);
+
+      $(e.target).attr("active",0);
+
+    }else{
+
+      $(e.target).attr("src",gif.images.original.url);
+
+      $(e.target).attr("active",1);
+
+    }
+
+  });
+
+
+  var title = $("<p>").addClass("gif_title width-80 margin-left-5 float-left").text(gif.title);
+  var rating = $("<p>").addClass("gif_title width-20 float-right").text(gif.rating);
+
+  gifImg.appendTo(container);
+  title.appendTo(container);
+  rating.appendTo(container);
+
+  $(".results_row").append(container);
+
+}
+
+
+$(".gif_button_main").on("click", function(){
+
+  var value = GetInputValue("gif_input_main");
+
+  if(CheckIfAlreadySearched(value)){
+
+    CreateTab(value);
+    GifConstruction(value);
 
   }
 
-};
-
-
-$(".submit").on("click",function(){
-  $(".searchBox").removeClass("muka");
-    $(".searchBox").addClass("nomuka");
-  var item = $("input").val();
-  gifConstruct(item);
 });
 
 
+const GifConstruction = async (value) =>{
+
+  $(".results_row").empty();
+
+  const {data} = await $.get({
+    url: 'https://api.giphy.com/v1/gifs/search?api_key=cac5b5f9a86a4977be453f3f2c50d4d6&q='+value+'&limit=20&offset=0&rating=PG&lang=en',
+    method: "GET"
+  });
+
+  PopulateGifsLoop(data);
+
+}
 
 
+const CheckIfAlreadySearched = (value) =>{
+    for (var i = 0; i < searched_terms.length; i++){
 
+      if(value == searched_terms[i]){
 
+        alert("Already Searched that Term!");
+        return false;
 
- $(document).on("click", ".gif", react);
+      }
+
+    }
+
+    return true;
+
+}
